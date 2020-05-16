@@ -6,7 +6,7 @@
 #    By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/13 01:33:55 by mschmidt          #+#    #+#              #
-#    Updated: 2020/05/13 16:56:01 by mschmidt         ###   ########.fr        #
+#    Updated: 2020/05/15 18:08:55 by mschmidt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,18 +16,18 @@ OBJ = ft_printf.o
 #OBJ = $(SRC:.c:.o)
 FLAGS = -Wall -Wextra -Werror
 
-LIBFT_DIR = libft
+LIBFT_DIR = ./libft
 
 all: $(NAME)
 
 libft:
-	$(MAKE) -C libft
+	$(MAKE) -C $(LIBFT_DIR)
 
-$(NAME): libft
+$(NAME): libft $(SRC)
 	gcc -c $(FLAGS) $(SRC)
 	ar rc $(NAME) $(OBJ)
 	### REMOVE LINE BELOW!!!
-	gcc -I $(LIBFT_DIR) $(SRC) -L $(LIBFT_DIR) -lft
+	gcc main.c $(OBJ) -v -L$(LIBFT_DIR) -lft
 
 clean:
 	rm -f $(OBJ)

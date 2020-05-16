@@ -6,35 +6,71 @@
 /*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/12 19:48:31 by mschmidt          #+#    #+#             */
-/*   Updated: 2020/05/15 15:30:30 by mschmidt         ###   ########.fr       */
+/*   Updated: 2020/05/15 19:49:36 by mschmidt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdarg.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "libft.h"
+#include "./libft/libft.h"  // FIX THIS TRASH!!
 
+/*
 void	printf_conv_flags(const char **arg, const char flag)
 {
 	
 }
+*/
 
-char	*printf_parser(const char *str)
+void	ft_lstprint(t_list *lst, char *delimiter)
+{
+	while (lst != NULL)
+	{
+		ft_putstr_fd(lst->content, 1);
+		ft_putstr_fd(delimiter, 1);
+		lst = lst->next;
+	}
+}
+
+char	*printf_parser(const char *str, t_list **stack)
 {
 	int		i;
 	const char	convchar[9];
+	int		start;
 
 	if (!str)
 		return (0);
-	i = 0;
+	i = 1;
+	start = 0;
 	ft_strlcpy((char*)convchar, "cspdiuxX", 9);
+	ft_putstr_fd("parser str: ", 1);
+	ft_putstr_fd(str, 1);
 	while (!ft_strchr(convchar, str[i]))
+	{
+		if (ft_isdigit(str[i]))
+		{
+			if(ft_isdigit(str[i + 1]) && start == 0)
+				start = i;
+		}
+		else if (start > 0 && !ft_isdigit(str[i]))
+		{
+			ft_lstadd_front(stack, ft_lstnew(ft_substr(str, start, (i - start))));
+			ft_lstadd_front(stack, ft_lstnew(ft_substr(&str[i], 0, 1)));
+			start = 0;
+		}
+		else
+			ft_lstadd_front(stack, ft_lstnew(ft_substr(&str[i], 0, 1)));
 		i++;
+		ft_lstprint(*stack, "");
+		ft_putstr_fd("\n", 1);
+	}
+	ft_lstadd_front(stack, ft_lstnew(ft_substr(&str[i], 0, 1)));
+	ft_lstprint(*stack, " ");
+	ft_putstr_fd("\n", 1);
 	return(ft_substr(str, 0, (i + 1)));
 }
 
-char	*printf_flag_star(const char *pars, int num)
+char	*printf_replace_star(const char *pars, int num)
 {
 	int		i;
 	char	*str;
@@ -53,22 +89,26 @@ int		ft_printf(const char *str, ...)
 {
 	int				idx;
 	va_list			args;
-	unsigned char	c;
-	char			*i;
+	//unsigned char	c;
+	//char			*i;
 	char			*temp;
+	t_list			*f_stack;
 
 	idx = 0;
 	va_start(args, str);
-	temp = printf_parser(ft_strchr(str, '%'));
-	if (ft_strchr(temp, '*'))
-		temp = printf_flag_star(temp, va_arg(args, int)); // Memory Leak here
-	ft_putstr_fd(temp, 1);
+	ft_putstr_fd("input string: ", 1);
+	ft_putstr_fd(str, 1);
 	ft_putstr_fd("\n", 1);
-	if (ft_strchr(temp, '*'))
-		temp = printf_flag_star(temp, va_arg(args, int)); // Memory Leak here
-	ft_putstr_fd(temp, 1);
-	ft_putstr_fd("\n", 1);
+	while (str[idx] != '%')
+		idx++;
+	temp = printf_parser(&str[idx], &f_stack);
+	f_stack = NULL;
 
+	//if (ft_strchr(temp, '*'))
+	//	temp = printf_replace_star(temp, va_arg(args, int)); // Memory Leak here
+	//if (ft_strchr(temp, '*'))
+	//	temp = printf_replace_star(temp, va_arg(args, int)); // Memory Leak here
+	
 	idx = 0;
 	/*
 	while (str[idx] != '\0')
@@ -95,9 +135,4 @@ int		ft_printf(const char *str, ...)
 	*/
 	va_end(args);
 	return (idx);
-}
-
-int		main()
-{
-	ft_printf("Your Mom! %-0*.*d Dude!", 11, 5, 7);
 }
