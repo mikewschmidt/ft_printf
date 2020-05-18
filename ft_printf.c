@@ -6,7 +6,7 @@
 /*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/15 19:53:47 by mschmidt          #+#    #+#             */
-/*   Updated: 2020/05/17 02:39:11 by mschmidt         ###   ########.fr       */
+/*   Updated: 2020/05/18 05:17:55 by mschmidt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,51 +59,92 @@ t_list	*ft_lstfind(t_list *lst, void *content)
 {
 	while (lst)
 	{
-		if (ft_strncmp(lst->content, content, ft_strlen(content)))
+		if (!ft_strncmp(lst->content, content, ft_strlen(content)))
 			return (lst);
 		lst = lst->next;
 	}
 	return (NULL);
 }
 
-void	ft_lstreplaceone(t_list **lst, void *old, void *new)
+void	ft_lstreplaceone(t_list **lst, t_list *old, t_list *new)
 {
-	t_list	*curr;
-
-	curr = *lst;
-	while (curr)
-	{
-		if (ft_strncmp(curr->content, old, ft_strlen(old)))
-		{
-			curr->content = new;
-		}
-	}
+	old->content = new->content;
+	*lst = *lst;
 }
+
+t_list	*create_call_stack(const char *str)
+{
+	int		i;
+	t_list	*call_stack;
+	char	conv_char[9];
+	int		zero_flag;
+	int		prec_flag;
+
+	i = 0;
+	zero_flag = 0;
+	prec_flag = 0;
+	ft_strlcpy((char*)conv_char, "cspdiuxX", 9);
+	while (!ft_strchr(conv_char, str[i]))
+	{
+		if (str[i] == '-')
+		{
+			ft_lstadd_front(&call_stack, ft_lstnew((char*)&left_adjust));
+			zero_flag = 1;
+		}
+		else if (str[i] == '0' && zero_flag == 0)
+		{
+			ft_lstadd_front(&call_stack, ft_lstnew((char*)&zeropad_adjust));
+			zero_flag = 0;
+		}
+		else if ((str[i] == '*' || ft_isdigit(str[i])) && prec_flag == 0)
+			ft_lstadd_front(&call_stack, ft_lstnew((char*)&width_adjust));
+		else if (str[i] == '.')
+			prec_flag = 1;
+		else if ((str[i] == '*' || ft_isdigit(str[i])) && prec_flag == 1)
+			ft_lstadd_front(&call_stack, ft_lstnew((char*)&precision_adjust));
+		else 
+		{
+			ft_putstr_fd("UNKNOWN CHARACTER!", 1);
+			return (NULL);
+		}
+		i++;
+	}
+	ft_lstadd_front(&call_stack, ft_lstnew((char*)&str[i]));
+	return (call_stack);
+}
+
 int		ft_printf(const char *str, ...)
 {
 	int		idx;
-	t_list	*stack;
-	char	*flags;
+	t_list	*spec_stack;
+	t_list	*call_stack;
+	t_list	*temp_node;
+	//char	*flags;
 	char	*width;
-	char	*precision;
-	char	*conv;
+	//int		precision;
+	//char	*conv;
 	va_list	args;
 
 	idx = 0;
-	stack = NULL;
+	spec_stack = NULL;
 	va_start(args, str);
 	while (str[idx] != '%')
 		idx++;
-	printf_parser(&stack, &str[idx]);
-	ft_lstprint(stack, "");
+	printf_parser(&spec_stack, &str[idx]);
+	call_stack = create_call_stack(&str[idx]);
+	ft_lstprint(spec_stack, "");
 	ft_putstr_fd("\n", 1);
-	if (ft_lstfind(stack, "*"))
+	if ((temp_node = ft_lstfind(spec_stack, "*")))
 	{
 		ft_putstr_fd("found a *", 1); //REMOVE
 		ft_putstr_fd("\n", 1);// REMOVE
-		ft_lstreplaceone(&stack, "*", &va_arg(args, int));
+		ft_putstr_fd(temp_node->content, 1); //REMOVE
+		ft_putstr_fd("\n", 1);// REMOVE
+		width = ft_itoa(va_arg(args, int)); //REMOVE
+		temp_node->content = width;
+		//ft_lstreplaceone(&spec_stack, "*", ft_lstnew(va_arg(args, int)));
 	}
-	ft_lstprint(*stack, "");
+	ft_lstprint(spec_stack, "");
 	ft_putstr_fd("\n", 1);
 
 	return (0);
