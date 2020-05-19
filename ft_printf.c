@@ -6,7 +6,7 @@
 /*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/15 19:53:47 by mschmidt          #+#    #+#             */
-/*   Updated: 2020/05/18 18:33:07 by mschmidt         ###   ########.fr       */
+/*   Updated: 2020/05/18 20:34:06 by mschmidt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	conv_adjust(t_list **lst, char param)
 	}	
 }
 
-t_list	*adjust_param(void *param, void (*adjust)(t_list**))
+t_list	*adjust_param(void *param, t_list *spec, void (*adjust)(t_list**, char))
 {
 	adjust(	
 }
@@ -69,7 +69,7 @@ void	ft_lstprint(t_list *lst, const char *delim)
 
 }
 
-void	printf_parser(t_list **stack, const char *str)
+void	spec_parser(t_list **stack, const char *str)
 {
 	int		i;
 	const char	convchar[9];
@@ -157,6 +157,7 @@ int		ft_printf(const char *str, ...)
 	char	*width;
 	//int		precision;
 	//char	*conv;
+	char	*in_param;
 	va_list	args;
 
 	idx = 0;
@@ -164,9 +165,14 @@ int		ft_printf(const char *str, ...)
 	va_start(args, str);
 	while (str[idx] != '%')
 		idx++;
-	printf_parser(&spec_stack, &str[idx]);
+	spec_parser(&spec_stack, &str[idx]);
 	call_stack = create_call_stack(&str[idx]);
 	ft_lstprint(spec_stack, "");
+	in_param = ft_itoa(va_arg(args, int));
+	while (call_stack)
+	{
+		
+	}
 	ft_putstr_fd("\n", 1);
 	if ((temp_node = ft_lstfind(spec_stack, "*")))
 	{
