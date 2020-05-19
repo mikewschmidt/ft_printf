@@ -6,7 +6,7 @@
 /*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/15 19:53:47 by mschmidt          #+#    #+#             */
-/*   Updated: 2020/05/18 05:17:55 by mschmidt         ###   ########.fr       */
+/*   Updated: 2020/05/18 18:33:07 by mschmidt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,41 @@ void	left_adjust(t_list **lst);
 void	zeropad_adjust(t_list **lst);
 void	width_adjust(t_list **lst);
 void	precision_adjust(t_list **lst);
-t_list	*conv_stack(void *param, char conv);
+void	conv_adjust(t_list **lst, char param)
+{
+	int		prec_flag;
+	t_list	curr;
+	t_list	prev;
+
+	prec_flag = 0;
+	curr = *lst;
+	prev = curr;
+	if (param == 'd')
+	{
+		while (curr)
+		{
+			if (curr->content == '.')
+			{
+				prec_flag = 1;
+				prev->next = curr->next;
+				free(curr->content);
+				free(curr);
+			}
+			else if (prec_flag = 1)
+			{
+				free(curr->content);
+				free(curr);
+			}
+			prev = curr;
+			curr = curr->next;
+		}
+	}	
+}
+
+t_list	*adjust_param(void *param, void (*adjust)(t_list**))
+{
+	adjust(	
+}
 
 void	ft_lstprint(t_list *lst, const char *delim)
 {
@@ -97,11 +131,11 @@ t_list	*create_call_stack(const char *str)
 			zero_flag = 0;
 		}
 		else if ((str[i] == '*' || ft_isdigit(str[i])) && prec_flag == 0)
-			ft_lstadd_front(&call_stack, ft_lstnew((char*)&width_adjust));
+			ft_lstadd_front(&call_stack, ft_lstnew((char*)&width_adjust)); //will break if >9
 		else if (str[i] == '.')
 			prec_flag = 1;
 		else if ((str[i] == '*' || ft_isdigit(str[i])) && prec_flag == 1)
-			ft_lstadd_front(&call_stack, ft_lstnew((char*)&precision_adjust));
+			ft_lstadd_front(&call_stack, ft_lstnew((char*)&precision_adjust)); //will break if >9
 		else 
 		{
 			ft_putstr_fd("UNKNOWN CHARACTER!", 1);
@@ -109,7 +143,7 @@ t_list	*create_call_stack(const char *str)
 		}
 		i++;
 	}
-	ft_lstadd_front(&call_stack, ft_lstnew((char*)&str[i]));
+	ft_lstadd_front(&call_stack, ft_lstnew((char*)conv_adjust));
 	return (call_stack);
 }
 
