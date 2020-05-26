@@ -6,7 +6,7 @@
 #    By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/13 01:33:55 by mschmidt          #+#    #+#              #
-#    Updated: 2020/05/15 18:08:55 by mschmidt         ###   ########.fr        #
+#    Updated: 2020/05/25 18:11:30 by mschmidt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,14 +27,14 @@ $(NAME): libft $(SRC)
 	gcc -c $(FLAGS) $(SRC)
 	ar rc $(NAME) $(OBJ)
 	### REMOVE LINE BELOW!!!
-	gcc main.c $(OBJ) -v -L$(LIBFT_DIR) -lft
+	gcc main.c $(OBJ) -L$(LIBFT_DIR) -lft
 
 clean:
 	rm -f $(OBJ)
-	cd libft && rm -f *.o 
+	#cd libft && rm -f *.o 
 
 fclean: clean 
 	rm $(NAME)
-	-cd libft && rm -f libft.a
+	#cd libft && rm -f libft.a
 
 re: fclean all
