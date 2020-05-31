@@ -14,27 +14,34 @@ NAME = libftprintf.a
 SRC = ft_printf.c 
 OBJ = ft_printf.o
 #OBJ = $(SRC:.c:.o)
-FLAGS = -Wall -Wextra -Werror
-
+CFLAGS = -Wall -Wextra -Werror
 LIBFT_DIR = ./libft
+INCLUDES = -I $(LIBFT_DIR)
+LIBS = $(LIBFT_DIR)/*.o
 
 all: $(NAME)
 
 libft:
 	$(MAKE) -C $(LIBFT_DIR)
 
-$(NAME): libft $(SRC)
-	gcc -c $(FLAGS) $(SRC)
-	ar rc $(NAME) $(OBJ)
-	### REMOVE LINE BELOW!!!
-	gcc main.c $(OBJ) -L$(LIBFT_DIR) -lft
+$(NAME): 
+	gcc -c $(CFLAGS) $(INCLUDES) $(SRC)
+	ar rc $(NAME) $(OBJ) $(LIBS)
+	@### REMOVE LINE BELOW!!!
+	gcc main.c $(NAME) 
 
 clean:
-	rm -f $(OBJ)
-	#cd libft && rm -f *.o 
+	/bin/rm -f $(OBJ)
+	@#cd libft && rm -f *.o 
 
 fclean: clean 
-	rm $(NAME)
-	#cd libft && rm -f libft.a
+	/bin/rm -f $(NAME)
+	@#cd libft && rm -f libft.a
 
 re: fclean all
+
+debug:
+	gcc -c $(CFLAGS)  $(INCLUDES) $(SRC)
+	ar rc $(NAME) $(OBJ) $(LIBS)
+	@### REMOVE LINE BELOW!!!
+	gcc main.c $(NAME) -g -fsanitize=address 
