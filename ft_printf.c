@@ -152,7 +152,42 @@ void	width_adjust(char *spec, char **param)
 	}
 }
 
-int		spec_parser(const char *spec, va_list args, char **conv_param)
+void	left_adjust(char spec, char **param)
+{
+	int	i;
+	char	*parameter;
+	char	*temp;
+	int	len_param;
+
+	i = 0;
+	parameter = *param;
+	len_param = ft_strlen(parameter);
+	spec = (spec) ? 1 : 0; 
+	while (parameter[i] == ' ')
+		i++;
+	temp = (char*)ft_calloc(len_param + 1, sizeof(char));
+	ft_memset(temp, ' ', len_param);
+	ft_memcpy(temp, parameter + i, len_param - i); 
+	//printf("\n i: %i | len_param: %i |  temp: |%s| \n", i, len_param, temp); 
+	free(*param);
+	*param = temp;
+}
+
+void	zeropad_adjust(char spec, char **param)
+{
+	int	i;
+	char	*parameter;
+
+	i = 0;
+	parameter = *param;
+	while (parameter[i] == ' ' && spec == '0')
+	{
+		parameter[i] = '0';
+		i++;
+	}
+}
+
+int	spec_parser(const char *spec, va_list args, char **conv_param)
 {
 	int		i;
 	int		j;
@@ -178,10 +213,16 @@ int		spec_parser(const char *spec, va_list args, char **conv_param)
 	{
 		//if (spec[i] == '.')
 		//	prec_flag = 1; 
-		if (ft_isdigit(spec[i]) && zero_flag == -1 && spec[i] == 0)
+		if (spec[i] == '0' && zero_flag == -1)
+		{
 			zero_flag = 1;
-		else
+			//printf("zero padding \n");
+		}
+		else if (ft_isdigit(spec[i]) && zero_flag == -1)
+		{
 			zero_flag = 0;
+			//printf("No padding: %c \n", spec[i]);
+		}
 		if (ft_isdigit(spec[i]) && zero_flag != -1)
 		{
 			//if (prec_flag == 0)
@@ -266,13 +307,17 @@ int		spec_parser(const char *spec, va_list args, char **conv_param)
 			width_adjust(width, conv_param);
 			width = 0; //so it doesn't loop again if width is 2 or more digits
 		}
-		else if (spec[i] == 0 && zero_flag == 1)
+		else if (spec[i] == '0' && zero_flag == 1)
 		{
-			ft_putstr_fd("  execute zeropad_adjust(spec[i], conv_param)\n",1);
+			//ft_putstr_fd("  execute zeropad_adjust(spec[i], conv_param)\n",1);
+			zeropad_adjust(spec[i], conv_param);
 			zero_flag = 0;
 		}
 		else if (spec[i] == '-')
-			ft_putstr_fd("  execute left_adjust(spec[i], conv_param)\n",1);
+		{
+			//ft_putstr_fd("  execute left_adjust(spec[i], conv_param)\n",1);
+			left_adjust(spec[i], conv_param);
+		}
 			
 		i--;
 	}
