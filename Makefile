@@ -14,10 +14,10 @@ NAME = libftprintf.a
 SRC = ft_printf.c 
 OBJ = ft_printf.o
 #OBJ = $(SRC:.c:.o)
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS =# -Wall -Wextra -Werror //REACTIVATE WHEN DONE!!!!!
 LIBFT_DIR = ./libft
 INCLUDES = -I $(LIBFT_DIR)
-LIBS = $(LIBFT_DIR)/*.o
+LIBS = $(LIBFT_DIR)/*.o  # <-- Relook at this line again
 
 all: $(NAME)
 

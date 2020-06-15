@@ -21,6 +21,12 @@ typedef struct		s_call_stack
 	char			*spec;
 }					t_call_stack;
 
+typedef struct		s_param
+{
+	int		len;
+	char*		data;
+}			t_param;
+
 char	get_hex(int num)
 {
 	if (num <= 9)
@@ -113,11 +119,76 @@ char	*itoxstr(int num)
 		return (mod);
 }
 
+void	ft_putlong_fd(long long int n, int fd)
+{
+	char	c;
+
+	if (n == -9223372036854775807)
+		write(fd, "-9223372036854775807", 20);
+	else
+	{
+		if (n < 0)
+		{
+			n *= -1;
+			write(fd, "-", 1);
+		}
+		if (n < 10)
+		{
+			c = n + '0';
+			write(fd, &c, 1);
+		}
+		else
+		{
+			ft_putlong_fd(n / 10, fd);
+			ft_putlong_fd(n % 10, fd);
+		}
+	}	
+}
+
+static int	nbrcnt(long long int n)
+{
+	int	cnt;
+
+	cnt = 0;
+	if (n <= 0)
+		cnt++;
+	while (n != 0)
+	{
+		n /= 10;
+		cnt++;
+	}
+	return (cnt);
+}
+
+char	*ft_ltostr(long long int n)
+{
+	int	sign;
+	int	cnt;
+	char	*str;
+
+	sign = 1;
+	if (n < 0)
+		sign = -1;
+	cnt = nbrcnt(n);
+	str = (char*)ft_calloc(cnt + 1, sizeof(char));
+	if (!str)
+		return (NULL);
+	while (cnt--)
+	{
+		str[cnt] = ((n % 10) * sign) + '0';
+		n /= 10;
+	}
+	if (sign == -1)
+		str[0] = '-';
+	return (str);
+}
+
 void	conv_adjust(char spec, char **param)
 {
 	//int		i;
 	char	*ptr;
 	char	*temp;
+	///int	num;
 
 	//i = 0;
 	ptr = NULL;
@@ -130,6 +201,44 @@ void	conv_adjust(char spec, char **param)
 	{
 		temp = *param;
 		temp = ptr;
+	}
+	else if (spec == 'c')
+	{
+	//	printf("it's a char!");
+	}
+}
+
+void	precision_adjust(char *spec, char **param, len_param, char convchar)
+{
+	int	len_param;
+	int	prec;
+	char	*temp;
+
+	len_param = ft_strlen(*param);
+	if(spec)
+		prec = ft_atoi(spec);
+	else
+		prec = 0;
+	if (prec < len_param && convchar == 's')
+	{
+		temp = (char*)ft_calloc(prec + 1, sizeof(char));
+		ft_strlcpy(temp, *param, prec + 1);
+		free(*param);
+		*param = temp;
+	}
+	else if (prec > len_param && convchar != 's')
+	{
+		//printf("precision: %i is greater than lenght of input parameter\n", prec);
+		temp = (char*)ft_calloc(prec + 1, sizeof(char));
+		ft_memset(temp, '0', prec - len_param);
+		ft_strlcat(temp, *param, prec + 1);
+		free(*param);
+		*param = temp;
+	}
+	else if (prec == 0 && **param == '0')
+	{
+		free(*param);
+		*param = ft_strdup(""); 
 	}
 }
 
@@ -180,39 +289,48 @@ void	zeropad_adjust(char spec, char **param)
 
 	i = 0;
 	parameter = *param;
-	while (parameter[i] == ' ' && spec == '0')
-	{
-		parameter[i] = '0';
-		i++;
-	}
+	if (ft_strchr(parameter, '-'))
+		parameter[i++] = '-';
+	while ((parameter[i] == ' ' || parameter[i] == '-') && spec == '0')
+		parameter[i++] = '0';
 }
 
 int	spec_parser(const char *spec, va_list args, char **conv_param)
 {
 	int		i;
 	int		j;
-	const char	convchar[9];
-	//int		prec_flag;
+	const char	convchars[10];
+	char		convchar;
+	int		prec_flag;
 	int		zero_flag;
+	int		left_flag;
 	char		*width;
-	//char		prec;
+	char		*prec;
 	//char		*param;
+	int		len_param;
 	int			spec_size;
+	unsigned int	uint_temp;
 
 	//ft_putstr_fd("spec coming in:  ", 1); //REMOVE
 	//ft_putstr_fd(spec, 1); //REMOVE
 	//ft_putstr_fd("\n", 1); //REMOVE
 	i = 1;
 	j = 0;
-	//prec_flag = 0;
+	prec_flag = 0;
 	zero_flag = -1;
 	width = 0;
-	//prec = 0;
-	ft_strlcpy((char*)convchar, "cspdiuxX", 9);
-	while (!ft_strchr(convchar, spec[i]))
+	prec = 0;
+	left_flag = 0;
+	ft_strlcpy((char*)convchars, "cspdiuxXi%", 11);
+	while (!ft_strchr(convchars, spec[i]) && spec[i] != '\0')
 	{
-		//if (spec[i] == '.')
-		//	prec_flag = 1; 
+		if (spec[i] == '.')
+		{
+			prec_flag = 1; 
+			//printf("prec_flag set \n");
+		}
+		if (spec[i] == '-')
+			left_flag = 1;
 		if (spec[i] == '0' && zero_flag == -1)
 		{
 			zero_flag = 1;
@@ -223,10 +341,8 @@ int	spec_parser(const char *spec, va_list args, char **conv_param)
 			zero_flag = 0;
 			//printf("No padding: %c \n", spec[i]);
 		}
-		if (ft_isdigit(spec[i]) && zero_flag != -1)
+		if (ft_isdigit(spec[i]) && width == 0  && prec_flag == 0 && zero_flag != -1)
 		{
-			//if (prec_flag == 0)
-			//width = spec[i];
 			j = 0;
 			while (ft_isdigit(spec[i]))
 			{
@@ -236,71 +352,158 @@ int	spec_parser(const char *spec, va_list args, char **conv_param)
 			//printf("width size: %i \n", j);
 			width = (char*)ft_calloc(j + 1, sizeof(char));
 			ft_strlcpy(width, spec + i - j, j + 1); 
-			//printf("width: %s", width);
+			//printf("width: %s\n", width);
 			i--;
 			//else
 			//	prec = spec[i];
 		}
+		else if (ft_isdigit(spec[i]) && prec_flag == 1)
+		{
+			j = 0;
+			while (ft_isdigit(spec[i]))
+			{
+				j++;
+				i++;
+			}
+			prec = (char*)ft_calloc(j + 1, sizeof(char));
+			ft_strlcpy(prec, spec + i - j, j + 1);
+			//printf("prec: %s \n", prec);
+			i--;
+		}
 		i++;
 	}
+	//printf("specifier size:%i \n ", i + 1);
 	spec_size = i + 1;
-	//printf("zero_flag: %i | width: %c | conv chr: %c \n",
+	//printf("zero_flag: %i | width: %s | conv chr: %c \n",
 	//		zero_flag, width, spec[i]); //REMOVE
 	//////////  STORE THE INPUT PARAMETER /////////////
-	if (spec[i] == 'd' || spec[i] == 'i')
+	convchar = convchars[ft_strchr(convchars, spec[i]) - convchars] ;
+	if (convchar == 'd' || convchar == 'i')
 	{
 		*conv_param = ft_itoa(va_arg(args, int));
+		len_param = ft_strlen(*conv_param);
 		//ft_putstr_fd("input paramter:  ",1);
 		//printf("%x", va_arg(args,int));
 		//ft_putstr_fd(*conv_param, 1);
 		//ft_putstr_fd("\n", 1);
 	}
-	else if (spec[i] == 'u')
+	else if (convchar == 'u')
 	{
-		*conv_param = ft_itoa(va_arg(args, unsigned int));
+		//uint_temp = va_arg(args, unsigned int);
+		//ft_putlong_fd(uint_temp, 1);
+		//ft_putstr_fd("<-- this is uint_temp\n", 1);
+		*conv_param = ft_ltostr(va_arg(args, unsigned int));
+		len_param = ft_strlen(*conv_param);
+		//*conv_param = ft_itoa(va_arg(args, unsigned int));
 		//ft_putnbr_fd((unsigned int)va_arg(args, unsigned int), 1);
 		//ft_putstr_fd("\n", 1);
 	}
-	else if (spec[i] == 'x')
+	else if (convchar == 'x')
 	{
 		*conv_param = itoxstr(va_arg(args, unsigned int));
+		len_param = ft_strlen(*conv_param);
+		if (!*conv_param)
+		{
+			*conv_param = (char*)ft_calloc(2, sizeof(char));
+			**conv_param = '0';
+		}
 		//ft_putnbr_fd((unsigned int)va_arg(args, unsigned int), 1);
 		//ft_putstr_fd("\n", 1);
 	}
-	else if (spec[i] == 'X')
+	else if (convchar == 'X')
 	{
 		*conv_param = itoxstr(va_arg(args, unsigned int));
+		len_param = ft_strlen(*conv_param);
 		//ft_putstr_fd(*conv_param, 1);
+		if (!*conv_param)
+		{
+			*conv_param = (char*)ft_calloc(2, sizeof(char));
+			**conv_param = '0';
+		}
 		j = 0;
-		while (j < (*conv_param)[j])
+		while ((*conv_param)[j] != '\0')
 		{
 			(*conv_param)[j] = ft_toupper((*conv_param)[j]);
 			j++;
 		}
 	}
-	else if (spec[i] == 'c' || spec[i] == 's')
-		*conv_param = (char*)va_arg(args, int*);
+	else if (convchar == 'c')
+	{
+		*conv_param = (char*)ft_calloc(2, sizeof(char));
+		(*conv_param)[0] = va_arg(args, unsigned int);
+		len_param = 1; 
+	}
+	else if (convchar == 's')
+	{
+		//ft_putstr_fd("this is a string \n", 1);
+		*conv_param = va_arg(args, char*);
+		len_param = ft_strlen(*conv_param);
+	}	
+	else if (convchar == '%')
+	{
+		//printf("found %% \n");
+		*conv_param = (char*)ft_calloc(2, sizeof(char));
+		len_param = 1; 
+		ft_strlcpy(*conv_param, "%", 2);
+		return (spec_size);
+	}
+	else
+		printf("what the ! happened!?");
 
 	*conv_param = ft_strdup(*conv_param);
 
 	//ft_putstr_fd("input param: ", 1); //REMOVE
 	//ft_putstr_fd(*conv_param, 1); //REMOVE
 	//ft_putstr_fd("\n",1); //REMOVE 
-
+	
+	if (prec_flag)
+	{
+		//ft_putstr_fd("  execute precision_adjust(spec[i], conv_param)\n",1);
+		precision_adjust(prec, conv_param, len_param, convchar);
+		prec_flag = 0;
+	}
+	if (width)
+	{
+		//ft_putstr_fd("  execute width_adjust(spec[i], conv_param)\n",1);
+		width_adjust(width, conv_param, len_param);
+		width = 0; //so it doesn't loop again if width is 2 or more digits
+	}
+	if (zero_flag && !left_flag)
+	{
+		//ft_putstr_fd("  execute zeropad_adjust(spec[i], conv_param)\n",1);
+		zeropad_adjust('0', conv_param, len_param);
+		zero_flag = 0;
+	}
+	if (left_flag)
+	{
+		//ft_putstr_fd("  execute left_adjust(spec[i], conv_param)\n",1);
+		left_adjust(spec[i], conv_param, len_param);
+	}
+	if (convchar == 'c')
+	{
+		//while (**conv_param)
+		//{
+		//	printf("while loop");
+		//	write (1, *conv_param++, 1);
+		//}
+		//write (1, *conv_param, 1); 
+		//spec_size++;
+	}
+/*
 	while (i > 0)
 	{
 		//ft_putchar_fd(spec[i], 1); //REMOVE
-		if (ft_strchr(convchar, spec[i]))
+		if (ft_strchr(convchars, spec[i]))
 		{
 			//ft_putstr_fd("  execute conv_adjust(spec[i], conv_param)\n",1);
-			conv_adjust(spec[i], conv_param);
+			//conv_adjust(spec[i], conv_param);
 		}
-		//else if (ft_isdigit(spec[i]) && prec_flag)
-		//{
-		//	ft_putstr_fd("  execute precision_adjust(spec[i], conv_param)\n",1);
-		//	prec_flag = 0;
-		//	precision_adjust(spec[i], conv_param);
-		//}
+		else if (ft_isdigit(spec[i]) && prec_flag)
+		{
+			ft_putstr_fd("  execute precision_adjust(spec[i], conv_param)\n",1);
+			precision_adjust(prec, conv_param, convchar);
+			prec_flag = 0;
+		}
 		else if (ft_isdigit(spec[i]) && width)
 		{
 			//ft_putstr_fd("  execute width_adjust(spec[i], conv_param)\n",1);
@@ -322,6 +525,7 @@ int	spec_parser(const char *spec, va_list args, char **conv_param)
 		i--;
 	}
 	//ft_putstr_fd("\n", 1); //REMOVE
+*/
 	return (spec_size);
 }
 
@@ -347,8 +551,10 @@ int		ft_printf(const char *str, ...)
 		}
 		else
 		{
-			idx += spec_parser(ft_strchr(str, '%'), args, &conv_output);
+			//printf("start idx: %i | ", idx);
+			idx += spec_parser(str + idx, args, &conv_output);
 			ft_putstr_fd(conv_output, 1);
+			//printf("end idx: %i \n", idx);
 			count += ft_strlen(conv_output);
 			free(conv_output);
 		}
