@@ -6,7 +6,7 @@
 /*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/18 20:36:08 by mschmidt          #+#    #+#             */
-/*   Updated: 2020/05/25 18:06:02 by mschmidt         ###   ########.fr       */
+/*   Updated: 2020/06/29 00:56:29 by mschmidt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,28 +214,36 @@ void	conv_adjust(char spec, t_param *param)
 
 void	precision_adjust(char *spec, t_param *param, char convchar)
 {
-	int	prec;
+	int		prec;
 	char	*temp;
-	int	offset;
+	int		offset;
 
 	offset = (param->data[0] == '-' && convchar != 's') ? 1 : 0;
 	if (spec)
 	{
 		prec = ft_atoi(spec);
 		if (prec < 0)
-		{
 			prec = 1;
-		}
 	}
 	else
 		prec = 0;
-	if (prec < param->len && convchar == 's')
+	if (convchar == 's' && prec < param->len)
 	{
 		temp = (char*)ft_calloc(prec + 1, sizeof(char));
 		ft_strlcpy(temp, param->data, prec + 1);
 		free(param->data);
 		param->data = temp;
 		param->len = prec;
+	}
+	else if (convchar == 'p' && prec > param->len - 2)
+	{
+		temp = (char*)ft_calloc(prec + 3, sizeof(char));
+		ft_memset(temp, '0', prec - param->len + 4);
+		ft_strlcat(temp, param->data + 2, prec + 3);
+		free(param->data);
+		param->data = temp;
+		ft_memcpy(param->data, "0x", 2);
+		param->len = prec + 2;
 	}
 	else if (convchar != 's' && convchar != 'c' && prec > param->len - offset)
 	{
@@ -251,7 +259,13 @@ void	precision_adjust(char *spec, t_param *param, char convchar)
 		param->data = temp;
 		param->len = prec + offset;
 	}
-	else if (prec == 0 && param->data[0] == '0')
+	else if (prec == 0 && convchar == 'p' && ft_strncmp(param->data, "0x0", 3) == 0)
+	{
+		free(param->data); // Don't free data just destroy it!!!
+		param->data = ft_strdup("0x");
+		param->len = 2;
+	}
+	else if (prec == 0 && param->data[0] == '0' && param->len == 1)
 	{
 		free(param->data); // Don't free data just destroy it!!!
 		param->data = ft_strdup(""); 
@@ -265,7 +279,7 @@ void	width_adjust(int spec, t_param *param)
 	char	*temp;
 
 	width = spec;
-	printf("width: %i", width);
+	//printf("width: %i", width);
 	if (width < 0)
 		return ;
 	if (param->len < width)
@@ -310,6 +324,7 @@ void	zeropad_adjust(char spec, t_param *param)
 		parameter[i++] = '-';
 	if (ft_strchr(parameter, '+'))
 		parameter[i++] = '+';
+	//printf("Zero padding");
 	while ((parameter[i] == ' ' || parameter[i] == '-' || parameter[i] == '+') && spec == '0')
 		parameter[i++] = '0';
 }
@@ -398,7 +413,7 @@ void	replace_spec(char *spec, va_list args, t_param *param)
 		}
 		if (spec[i] == '-' && prec_flag == 0)
 			left_flag = 1;
-		if (spec[i] == '-' && prec_flag == 1)
+		else if (spec[i] == '-' && prec_flag == 1)
 			prec_flag = -1;
 		if (spec[i] == '0' && zero_flag == -1)
 		{
@@ -436,6 +451,7 @@ void	replace_spec(char *spec, va_list args, t_param *param)
 				j++;
 				i++;
 			}
+			//printf("prec_flag: %i \n", prec_flag);
 			if (prec_flag == 1)
 			{
 				prec = (char*)ft_calloc(j + 1, sizeof(char));
@@ -460,7 +476,7 @@ void	replace_spec(char *spec, va_list args, t_param *param)
 			width = param->len + 1;
 		//ft_putstr_fd("input parameter:  ",1);
 		//ft_putstr_fd(param->data, 1);
-		///ft_putstr_fd("\n", 1);
+		//ft_putstr_fd("\n", 1);
 	}
 	else if (convchar == 'u')
 	{
@@ -473,7 +489,7 @@ void	replace_spec(char *spec, va_list args, t_param *param)
 		//ft_putnbr_fd((unsigned int)va_arg(args, unsigned int), 1);
 		//ft_putstr_fd("\n", 1);
 	}
-	else if (convchar == 'x' || convchar == 'p')
+	else if (convchar == 'p')
 	{
 		param->data = itoxstr(va_arg(args, unsigned long));
 		if (!param->data)
@@ -486,13 +502,13 @@ void	replace_spec(char *spec, va_list args, t_param *param)
 			tempstr = ft_strjoin("0x", param->data);
 			free(param->data);
 			param->data = tempstr;
-
+			//printf("param->data: %s \n", param->data);
 		}
 		param->len = ft_strlen(param->data);
 		//ft_putnbr_fd((unsigned int)va_arg(args, unsigned int), 1);
 		//ft_putstr_fd("\n", 1);
 	}
-	else if (convchar == 'X')
+	else if (convchar == 'X' || convchar == 'x')
 	{
 		param->data = itoxstr(va_arg(args, unsigned int));
 		//ft_putstr_fd(*conv_param, 1);
@@ -502,11 +518,14 @@ void	replace_spec(char *spec, va_list args, t_param *param)
 			param->data[0] = '0';
 		}
 		param->len = ft_strlen(param->data);
-		j = 0;
-		while ((param->data)[j] != '\0')
+		if (convchar == 'X')
 		{
-			(param->data)[j] = ft_toupper((param->data)[j]);
-			j++;
+			j = 0;
+			while ((param->data)[j] != '\0')
+			{
+				(param->data)[j] = ft_toupper((param->data)[j]);
+				j++;
+			}
 		}
 	}
 	else if (convchar == 'c')
@@ -524,7 +543,7 @@ void	replace_spec(char *spec, va_list args, t_param *param)
 		param->len = ft_strlen(tempstr);
 		param->data = (char*)ft_calloc(param->len + 1, sizeof(char));
 		ft_strlcpy(param->data, tempstr, param->len + 1);
-	}	
+	}
 	else if (convchar == '%')
 	{
 		//printf("found %% \n");
@@ -532,10 +551,11 @@ void	replace_spec(char *spec, va_list args, t_param *param)
 		param->len = 1; 
 		ft_strlcpy(param->data, "%", 2);
 		//return (spec_size);
-		return ;
+		//return ;
 	}
 	else
-		printf("what the ! happened!?");
+		//printf("what the ! happened!?");
+		return ;
 
 	//param->data = ft_strdup(param->data);
 
@@ -559,14 +579,14 @@ void	replace_spec(char *spec, va_list args, t_param *param)
 		free(param->data);
 		param->data = tempstr;
 		param->len = ft_strlen(param->data);
-	}	
+	}
 	if (width)
 	{
-		//printf("  execute width_adjust(%i, conv_param)\n", width);
+		//printf("  execute width_adjust(%i, param)\n", width);
 		width_adjust(width, param);
 		width = 0; //I don't think I need to set this as 0 since this is not a loop anymore 
 	}
-	if (zero_flag == 1 && !left_flag && !prec_flag)
+	if (zero_flag == 1 && !left_flag && prec_flag != 1)
 	{
 		//ft_putstr_fd("  execute zeropad_adjust(spec[i], conv_param)\n",1);
 		zeropad_adjust('0', param);
