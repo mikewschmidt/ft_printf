@@ -11,9 +11,11 @@
 # **************************************************************************** #
 
 NAME = libftprintf.a
-SRC = ft_printf.c 
-OBJ = ft_printf.o
-#OBJ = $(SRC:.c:.o)
+SRC = ft_printf.c ft_btoxstr.c ft_itoxstr.c ft_ltostr.c ft_putlong_ft.c \
+      ft_tohex.c left_adjust precision_adjust.c replace_spec.c replace_stars.c \
+      width_adjust.c zeropad_adjust.c
+#OBJ = ft_printf.o
+OBJ = $(SRC:.c:.o)
 CFLAGS =# -Wall -Wextra -Werror //REACTIVATE WHEN DONE!!!!!
 LIBFT_DIR = ./libft
 INCLUDES = -I $(LIBFT_DIR)
