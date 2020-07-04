@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include "libftprintf.h"
 #include "libft.h"
 
 void    zeropad_adjust(char spec, t_param *param)

@@ -1,4 +1,5 @@
 
+#include <stdlib.h>
 
 char    ft_tohex(int num)
 {
@@ -7,5 +8,5 @@ char    ft_tohex(int num)
         else if (num <= 15)
                 return ('a' - 10 + num);
 	else
-		return (NULL);
+		return (num);
 }

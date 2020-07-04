@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include "libftprintf.h"
 #include "libft.h"
 
 void    precision_adjust(char *spec, t_param *param, char convchar)

@@ -12,7 +12,7 @@
 
 NAME = libftprintf.a
 SRC = ft_printf.c ft_btoxstr.c ft_itoxstr.c ft_ltostr.c ft_putlong_ft.c \
-      ft_tohex.c left_adjust precision_adjust.c replace_spec.c replace_stars.c \
+      ft_tohex.c left_adjust.c precision_adjust.c replace_spec.c replace_stars.c \
       width_adjust.c zeropad_adjust.c
 #OBJ = ft_printf.o
 OBJ = $(SRC:.c:.o)
@@ -30,7 +30,7 @@ $(NAME):
 	gcc -c $(CFLAGS) $(INCLUDES) $(SRC)
 	ar rc $(NAME) $(OBJ) $(LIBS)
 	@### REMOVE LINE BELOW!!!
-	gcc main.c $(NAME) 
+	#gcc main.c $(NAME) 
 
 clean:
 	/bin/rm -f $(OBJ)

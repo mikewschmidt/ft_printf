@@ -1,5 +1,7 @@
 
 #include <stdlib.h>
+#include <unistd.h>
+#include "libft.h"
 #include "libftprintf.h"
 
 static int     *tobinary(long num)

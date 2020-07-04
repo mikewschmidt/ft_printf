@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include "libftprintf.h"
 #include "libft.h"
 
 void    width_adjust(int spec, t_param *param)

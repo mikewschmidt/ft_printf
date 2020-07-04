@@ -1,4 +1,6 @@
 
+#include <stdlib.h>
+#include "libftprintf.h"
 
 char    *ft_btoxstr(int *arr)
 {

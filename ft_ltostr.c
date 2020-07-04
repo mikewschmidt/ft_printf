@@ -1,4 +1,6 @@
 
+#include <stdlib.h>
+#include "libft.h"
 
 static int      nbrcnt(long long int n)
 {

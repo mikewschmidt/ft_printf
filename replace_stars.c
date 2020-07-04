@@ -1,5 +1,7 @@
 
+#include <stdarg.h>
 #include <stdlib.h>
+#include "libft.h"
 #include "libftprintf.h"
 
 void    replace_stars(char **spec, va_list args)

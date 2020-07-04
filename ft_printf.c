@@ -1,5 +1,8 @@
 
+#include <stdarg.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include "libft.h"
 #include "libftprintf.h"
 
 static char	*extract_spec(const char *str)
