@@ -1,6 +1,4 @@
 
-#include <stdlib.h>
-
 char    ft_tohex(int num)
 {
         if (num <= 9)

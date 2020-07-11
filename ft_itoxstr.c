@@ -1,6 +1,5 @@
 
 #include <stdlib.h>
-#include <unistd.h>
 #include "libft.h"
 #include "libftprintf.h"
 
@@ -27,7 +26,22 @@ static int     *tobinary(long num)
         return (num_arr);
 }
 
-char    *ft_itoxstr(long num)
+static char	*combine_hex(char *div, char *mod)
+{
+	char	*xstr;
+
+        if (div)
+        {
+                xstr = ft_strjoin(div, mod);
+                free(div);
+                free(mod);
+                return (xstr);
+        }
+        else
+                return (mod);
+}
+
+char    	*ft_itoxstr(long num)
 {
         char    *mod;
         char    *div;
@@ -42,7 +56,7 @@ char    *ft_itoxstr(long num)
                 free(num_arr);
                 return (xstr);
         }
-        if (num == 0)
+	else if (num == 0)
                 return (NULL);
         else
         {
@@ -51,13 +65,5 @@ char    *ft_itoxstr(long num)
                 mod = ft_calloc(2, sizeof(char));
                 ft_strlcpy(mod, &temp, 2);
         }
-        if (div)
-        {
-                xstr = ft_strjoin(div, mod);
-                free(div);
-                free(mod);
-                return (xstr);
-        }
-        else
-                return (mod);
+	return (combine_hex(div, mod));
 }

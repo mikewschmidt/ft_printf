@@ -10,6 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef LIBFTPRINTF_H
+# define LIBFTPRINTF_H
+
 #include <stdarg.h>
 
 typedef struct		s_call_stack
@@ -24,25 +27,27 @@ typedef struct          s_param
         int             len;
 }                       t_param;
 
-char    get_hex(int num)
+typedef struct		s_spec
 {
-        if (num <= 9)
-                return (num + '0');
-        else
-                return ('a' - 10 + num);
-}
+	int		prec_flag;
+	int		zero_flag;
+	int		left_flag;
+	int		space_flag;
+	int		plus_flag;
+	int		width;
+	int		prec;
+	char		convchar;
+}			t_spec;
 
-int	ft_printf(const char *str, ...);
-void	replace_spec(char *spec, va_list args, t_param *param);
-char    *ft_btoxstr(int *arr);
-void    left_adjust(char spec, t_param *param);
-char    ft_tohex(int num);
-void    precision_adjust(char *spec, t_param *param, char convchar);
-void    ft_putlong_fd(long long int n, int fd);
-char    *ft_ltostr(long long int n);
-char    *ft_itoxstr(long num);
-void    zeropad_adjust(char spec, t_param *param);
-void    width_adjust(int spec, t_param *param);
-void    replace_stars(char **spec, va_list args);
+int		ft_printf(const char *str, ...);
+void		parse_spec(t_spec *fspec, const char *spec);
+t_param		*replace_convchar(const t_spec *fspec, va_list args, t_param *param);
+char    	*ft_btoxstr(int *arr);
+char    	ft_tohex(int num);
+void    	precision_adjust(const int spec, t_param *param, char convchar);
+void    	ft_putlong_fd(long long int n, int fd);
+char    	*ft_ltostr(long long int n);
+char    	*ft_itoxstr(long num);
+char		*ft_strappd(char *str, char *appstr, int strbase);
 
-
+#endif
