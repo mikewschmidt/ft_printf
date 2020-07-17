@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "libftprintf.h"
 #include "libft.h"
+#include <stdio.h>
 
 static void	str_prec_adjust(int prec, t_param *param)
 {
@@ -17,13 +18,15 @@ static void	str_prec_adjust(int prec, t_param *param)
 static void	ptr_prec_adjust(int prec, t_param *param)
 {
 	char	*temp;
+	char	*prefix;
 
+	prefix = (ft_strchr(param->data, 'x')) ? "0x" : "0X";
 	temp = (char*)ft_calloc(prec + 3, sizeof(char));
 	ft_memset(temp, '0', prec - param->len + 4);
 	ft_strlcat(temp, param->data + 2, prec + 3);
 	free(param->data);
 	param->data = temp;
-	ft_memcpy(param->data, "0x", 2);
+	ft_memcpy(param->data, prefix, 2);
 	param->len = prec + 2;
 }
 
@@ -48,24 +51,32 @@ static void	null_prec_adjust(t_param *param, char *nullstr)
 	param->len = ft_strlen(param->data);
 }
 
-void		precision_adjust(int prec, t_param *param, char convchar)
+void		precision_adjust(int prec, t_param *param, t_spec *fspec)
 {
-        char    	*temp;
-        int             offset;
+	char	convchar;
+	char	*temp;
+	int		offset;
 
-        offset = (param->data[0] == '-' && convchar != 's') ? 1 : 0;
-        if (!prec)
-                prec = 0;
+	convchar = fspec->convchar;
+	offset = (param->data[0] == '-' && convchar != 's') ? 1 : 0;
+	//printf("prec_adjust - param->data: %s | param->len: %i\n", param->data, param->len);
+	if (!prec)
+		prec = 0;
 	if (prec < 0)
 		prec = 1;
-        if (convchar == 's' && prec < param->len)
+	//printf("param->data: %s | len: %i | convchar: %c | prec: %i \n", param->data, param->len, convchar, prec);  
+	if (convchar == 's' && prec < param->len)
 		str_prec_adjust(prec, param);
-        else if (convchar == 'p' && prec > param->len - 2)
+	else if (convchar == 'p' &&  prec > param->len - 2)
 		ptr_prec_adjust(prec, param); 
-        else if (convchar != 's' && convchar != 'c' && prec > param->len - offset)
+	else if (ft_strchr("xX", convchar) && fspec->hash_flag && prec > param->len - 2)
+		ptr_prec_adjust(prec, param);
+	else if (convchar != 's' && convchar != 'c' && prec > param->len - offset)
 		nonchars_prec_adjust(prec, param, offset);
-        else if (prec == 0 && convchar == 'p' && ft_strncmp(param->data, "0x0", 3) == 0)
+	else if (prec == 0 && convchar == 'p' && ft_strncmp(param->data, "0x0", 3) == 0)
 		null_prec_adjust(param, "0x");
-        else if (prec == 0 && param->data[0] == '0' && param->len == 1)
+	//else if (prec == 0 && convchar == 'x' && ft_strncmp(param->data, "0x0", 3) == 0)
+	//	null_prec_adjust(param, "");
+	else if (prec == 0 && param->data[0] == '0' && param->len == 1)
 		null_prec_adjust(param, "");
 }

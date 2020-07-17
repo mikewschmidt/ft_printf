@@ -1,7 +1,8 @@
 
 #include "libftprintf.h"
 #include "libft.h"
-
+#include <stdlib.h>
+#include <stdio.h> //REMOVE THIS LINE!
 static void	set_width(const char *spec, int *idx, t_spec *fspec)
 {
 	int	j;
@@ -42,6 +43,12 @@ static void	set_prec(const char *spec, int *idx, t_spec *fspec)
 	*idx = --i;
 }
 
+static void set_plus(t_spec *fspec)
+{
+	fspec->space_flag = 0;
+	fspec->plus_flag = 1;
+}
+
 static void	set_fspec(const char *spec, int *idx, t_spec *fspec)
 {
 	int	i;
@@ -50,10 +57,9 @@ static void	set_fspec(const char *spec, int *idx, t_spec *fspec)
 	if (i == 1 && spec[i] == ' ')
 		fspec->space_flag = 1;
 	if (spec[i] == '+')
-	{
-		fspec->space_flag = 0;
-		fspec->plus_flag = 1;
-	}
+		set_plus(fspec);
+	if (spec[i] == '#')
+		fspec->hash_flag = 1;
 	if (spec[i] == '.')
 		fspec->prec_flag = 1; 
 	if (spec[i] == '-' && fspec->prec_flag == 0)
@@ -88,4 +94,5 @@ void	parse_spec(t_spec *fspec, const char *spec)
 		i++;
 	}
 	fspec->convchar = *(ft_strchr("cspdiuxX%", spec[i]));
+	//printf("zero_flag: %i | left_flag: %i | width: %i  | prec_flag: %i | prec: %i  | space_flag: %i | plus_flag: %i | conv chr: %c \n", fspec->zero_flag, fspec->left_flag, fspec->width, fspec->prec_flag, fspec->prec, fspec->space_flag, fspec->plus_flag, fspec->convchar); //REMOVE
 }

@@ -21,10 +21,13 @@ static void	replace_part1(const t_spec *fspec, va_list args, t_param *param)
 	else if (fspec->convchar == 's')
 	{
 		tempstr = va_arg(args, char*);
-		if (!tempstr && (!fspec->prec || fspec->prec_flag == -1))
+		/*if (!tempstr && (!fspec->prec || fspec->prec_flag == -1))
 			tempstr = "(null)";
 		else if (!tempstr)
 			tempstr = (fspec->prec >= 6) ? "(null)" : "";
+			*/
+		if (!tempstr)
+			tempstr = "(null)";
 		param->data = (char*)ft_calloc(ft_strlen(tempstr) + 1, sizeof(char));
 		ft_strlcpy(param->data, tempstr, ft_strlen(tempstr) + 1);
 	}
@@ -42,7 +45,7 @@ static void	toupper_str(char *str)
 	}
 }
 
-static void	replace_part2(const t_spec *fspec, va_list args, t_param *param)
+static void	replace_part2(t_spec *fspec, va_list args, t_param *param)
 {
 	int	j;
 
@@ -62,14 +65,17 @@ static void	replace_part2(const t_spec *fspec, va_list args, t_param *param)
 		{
 			param->data = (char*)ft_calloc(2, sizeof(char));
 			param->data[0] = '0';
+			fspec->hash_flag = 0;
 		}
+		else if (fspec->hash_flag == 1)
+			param->data = ft_strappd("0x", param->data, 1); 
 		if (fspec->convchar == 'X')
 			toupper_str(param->data);
 	}
 }
 
 
-t_param	*replace_convchar(const t_spec *fspec, va_list args, t_param *param)
+t_param	*replace_convchar(t_spec *fspec, va_list args, t_param *param)
 {
 	param->len = -1;	
 	if (ft_strchr("dips", fspec->convchar))
@@ -81,7 +87,7 @@ t_param	*replace_convchar(const t_spec *fspec, va_list args, t_param *param)
 		param->data = (char*)ft_calloc(2, sizeof(char));
 		param->data[0] = '%';
 		param->len = 1; 
-		return (NULL);
+		//return (NULL);
 	}
 	else
 	{
