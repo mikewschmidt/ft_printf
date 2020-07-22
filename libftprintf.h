@@ -6,12 +6,15 @@
 /*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/15 16:39:16 by mschmidt          #+#    #+#             */
-/*   Updated: 2020/07/15 17:07:10 by mschmidt         ###   ########.fr       */
+/*   Updated: 2020/07/18 20:29:05 by mschmidt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFTPRINTF_H
 # define LIBFTPRINTF_H
+
+# define CONVCHARS "cspdiuxX%"
+# define CONVCHARS_SIZE 10 
 
 #include <stdarg.h>
 

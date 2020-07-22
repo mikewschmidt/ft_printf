@@ -65,10 +65,10 @@ static void	replace_fspec(char *input_spec, va_list args, t_param *param)
 static char	*extract_spec(const char *str)
 {
 	int	i;
-	char	convchars[10];
+	char	convchars[CONVCHARS_SIZE];
 
 	i = 1;
-	ft_strlcpy(convchars, "cspdiuxX%", 10);
+	ft_strlcpy(convchars, CONVCHARS, CONVCHARS_SIZE);
 	while (!ft_strchr(convchars, str[i]) && str[i] != '\0') 
 		i++;
 	return (ft_substr(str, 0, i + 1));
@@ -92,6 +92,7 @@ int		ft_printf(const char *str, ...)
 	int	count;
 	t_param	*param;
 	va_list	args;
+	int	*n;
 
 	idx = 0;
 	count = 0;

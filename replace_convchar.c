@@ -87,7 +87,6 @@ t_param	*replace_convchar(t_spec *fspec, va_list args, t_param *param)
 		param->data = (char*)ft_calloc(2, sizeof(char));
 		param->data[0] = '%';
 		param->len = 1; 
-		//return (NULL);
 	}
 	else
 	{
