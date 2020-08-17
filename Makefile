@@ -6,7 +6,7 @@
 #    By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/13 01:33:55 by mschmidt          #+#    #+#              #
-#    Updated: 2020/05/25 18:11:30 by mschmidt         ###   ########.fr        #
+#    Updated: 2020/08/17 07:26:15 by mschmidt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,34 +14,36 @@ NAME = libftprintf.a
 SRC = ft_printf.c ft_btoxstr.c ft_itoxstr.c ft_ltostr.c ft_putlong_fd.c \
       ft_tohex.c precision_adjust.c ft_strappd.c \
       parse_spec.c replace_convchar.c  flag_adjust.c 
-OBJ = *.o
-#OBJ = $(SRC:.c:.o)
-CFLAGS =# -Wall -Wextra -Werror //REACTIVATE WHEN DONE!!!!!
-LIBFT_DIR = ./libft
+HEADER = libftprintf.h
+OBJ = $(SRC:.c=.o)
+CFLAGS = -c -Wall -Wextra -Werror 
 INCLUDES = -I $(LIBFT_DIR)
-LIBS = $(LIBFT_DIR)/*.o  # <-- Relook at this line again
+LIBFT_DIR = libft
+LIBFT = $(LIBFT_DIR)/libft.a
 
 all: $(NAME)
 
-libft: $(LIBS)
-	$(MAKE) -C $(LIBFT_DIR)
-
 $(NAME): $(SRC)
-	gcc -c $(CFLAGS) $(INCLUDES) $(SRC)
-	ar rc $(NAME) $(OBJ) $(LIBS)
+	make -C $(LIBFT_DIR)
+	gcc $(CFLAGS) $(INCLUDES) $(SRC)
+	cp $(LIBFT) $(NAME)
+	ar rc $(NAME) $(OBJ) 
+	ranlib $(NAME)
 
 clean:
+	make -C $(LIBFT_DIR) clean
 	/bin/rm -f $(OBJ)
-	@#cd libft && rm -f *.o 
 
 fclean: clean 
+	make -C $(LIBFT_DIR) fclean
 	/bin/rm -f $(NAME)
-	@#cd libft && rm -f libft.a
 
 re: fclean all
 
-debug:
-	gcc -c $(CFLAGS)  $(INCLUDES) $(SRC)
-	ar rc $(NAME) $(OBJ) $(LIBS)
-	@### REMOVE LINE BELOW!!!
-	gcc main.c $(NAME) -g -fsanitize=address 
+bonus: re
+
+test: $(NAME)
+	gcc main.c -L. -lftprintf
+
+debug: $(NAME)
+	gcc main.c -L. -lftprintf -g -fsanitize=address 
