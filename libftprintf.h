@@ -6,7 +6,7 @@
 /*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/15 16:39:16 by mschmidt          #+#    #+#             */
-/*   Updated: 2020/08/17 07:36:16 by mschmidt         ###   ########.fr       */
+/*   Updated: 2020/08/17 07:47:07 by mschmidt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@
 # define CONVCHARS_SIZE 10
 
 # include <stdarg.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include "libft.h"
 
 typedef struct	s_call_stack
 {

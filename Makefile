@@ -6,7 +6,7 @@
 #    By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/05/13 01:33:55 by mschmidt          #+#    #+#              #
-#    Updated: 2020/08/17 07:26:15 by mschmidt         ###   ########.fr        #
+#    Updated: 2020/08/22 15:26:52 by mschmidt         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,7 +43,7 @@ re: fclean all
 bonus: re
 
 test: $(NAME)
-	gcc main.c -L. -lftprintf
+	gcc main.c $(INCLUDES) -L. -lftprintf
 
 debug: $(NAME)
-	gcc main.c -L. -lftprintf -g -fsanitize=address 
+	gcc main.c $(INCLUDES) -L. -lftprintf -g -fsanitize=address 

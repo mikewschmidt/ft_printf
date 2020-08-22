@@ -1,8 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   replace_convchar.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/08/17 07:59:22 by mschmidt          #+#    #+#             */
+/*   Updated: 2020/08/17 08:57:46 by mschmidt         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "libftprintf.h"
-#include "libft.h"
 
-static void	replace_part1(const t_spec *fspec, va_list args, t_param *param)
+static void		replace_part1(const t_spec *fspec, va_list args, t_param *param)
 {
 	char	*tempstr;
 
@@ -21,11 +31,6 @@ static void	replace_part1(const t_spec *fspec, va_list args, t_param *param)
 	else if (fspec->convchar == 's')
 	{
 		tempstr = va_arg(args, char*);
-		/*if (!tempstr && (!fspec->prec || fspec->prec_flag == -1))
-			tempstr = "(null)";
-		else if (!tempstr)
-			tempstr = (fspec->prec >= 6) ? "(null)" : "";
-			*/
 		if (!tempstr)
 			tempstr = "(null)";
 		param->data = (char*)ft_calloc(ft_strlen(tempstr) + 1, sizeof(char));
@@ -33,7 +38,7 @@ static void	replace_part1(const t_spec *fspec, va_list args, t_param *param)
 	}
 }
 
-static void	toupper_str(char *str)
+static void		toupper_str(char *str)
 {
 	int	i;
 
@@ -45,7 +50,7 @@ static void	toupper_str(char *str)
 	}
 }
 
-static void	replace_part2(t_spec *fspec, va_list args, t_param *param)
+static void		replace_part2(t_spec *fspec, va_list args, t_param *param)
 {
 	int	j;
 
@@ -68,16 +73,15 @@ static void	replace_part2(t_spec *fspec, va_list args, t_param *param)
 			fspec->hash_flag = 0;
 		}
 		else if (fspec->hash_flag == 1)
-			param->data = ft_strappd("0x", param->data, 1); 
+			param->data = ft_strappd("0x", param->data, 1);
 		if (fspec->convchar == 'X')
 			toupper_str(param->data);
 	}
 }
 
-
-t_param	*replace_convchar(t_spec *fspec, va_list args, t_param *param)
+t_param			*replace_convchar(t_spec *fspec, va_list args, t_param *param)
 {
-	param->len = -1;	
+	param->len = -1;
 	if (ft_strchr("dips", fspec->convchar))
 		replace_part1(fspec, args, param);
 	else if (ft_strchr("cuxX", fspec->convchar))
@@ -86,7 +90,7 @@ t_param	*replace_convchar(t_spec *fspec, va_list args, t_param *param)
 	{
 		param->data = (char*)ft_calloc(2, sizeof(char));
 		param->data[0] = '%';
-		param->len = 1; 
+		param->len = 1;
 	}
 	else
 	{

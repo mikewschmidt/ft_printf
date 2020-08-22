@@ -1,17 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/08/17 07:39:40 by mschmidt          #+#    #+#             */
+/*   Updated: 2020/08/17 09:47:37 by mschmidt         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include <stdarg.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include "libft.h"
 #include "libftprintf.h"
 
 static char	*replace_stars(char *spec, va_list args)
 {
-	int     i;
-	char    **strarr;
-	char    *str;
-	char    *temp;
-	char    *input_param;
+	int		i;
+	char	**strarr;
+	char	*str;
+	char	*input_param;
 
 	i = 0;
 	if (!ft_strchr(spec, '*'))
@@ -31,14 +37,14 @@ static char	*replace_stars(char *spec, va_list args)
 	free(strarr[i]);
 	free(strarr);
 	free(spec);
-	return(str);
+	return (str);
 }
 
 static void	replace_fspec(char *input_spec, va_list args, t_param *param)
 {
 	int		i;
 	int		j;
-	t_spec		*fspec;
+	t_spec	*fspec;
 
 	i = 1;
 	j = 0;
@@ -64,17 +70,20 @@ static void	replace_fspec(char *input_spec, va_list args, t_param *param)
 
 static char	*extract_spec(const char *str)
 {
-	int	i;
+	int		i;
 	char	convchars[CONVCHARS_SIZE];
 
 	i = 1;
 	ft_strlcpy(convchars, CONVCHARS, CONVCHARS_SIZE);
-	while (!ft_strchr(convchars, str[i]) && str[i] != '\0') 
+	while (!ft_strchr(convchars, str[i]) && str[i] != '\0')
 		i++;
 	return (ft_substr(str, 0, i + 1));
 }
 
-static int	replace_put_fspec(const char *str, va_list args, t_param *param, int *idx)
+static int	replace_put_fspec(const char *str, \
+		va_list args, \
+		t_param *param, \
+		int *idx)
 {
 	char	*input_spec;
 
@@ -86,13 +95,12 @@ static int	replace_put_fspec(const char *str, va_list args, t_param *param, int 
 	return (param->len);
 }
 
-int		ft_printf(const char *str, ...)
+int			ft_printf(const char *str, ...)
 {
-	int	idx;
-	int	count;
+	int		idx;
+	int		count;
 	t_param	*param;
 	va_list	args;
-	int	*n;
 
 	idx = 0;
 	count = 0;
@@ -111,5 +119,5 @@ int		ft_printf(const char *str, ...)
 	}
 	va_end(args);
 	free(param);
-	return(count);
+	return (count);
 }

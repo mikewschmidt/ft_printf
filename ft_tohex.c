@@ -1,10 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_tohex.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/08/17 07:56:18 by mschmidt          #+#    #+#             */
+/*   Updated: 2020/08/17 08:32:10 by mschmidt         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-char    ft_tohex(int num)
+char	ft_tohex(int num)
 {
-        if (num <= 9)
-                return (num + '0');
-        else if (num <= 15)
-                return ('a' - 10 + num);
+	if (num <= 9)
+		return (num + '0');
+	else if (num <= 15)
+		return ('a' - 10 + num);
 	else
 		return (num);
 }
