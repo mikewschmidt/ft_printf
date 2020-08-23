@@ -6,7 +6,7 @@
 /*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/17 07:59:22 by mschmidt          #+#    #+#             */
-/*   Updated: 2020/08/17 08:57:46 by mschmidt         ###   ########.fr       */
+/*   Updated: 2020/08/22 15:44:33 by mschmidt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,6 @@ static void		toupper_str(char *str)
 
 static void		replace_part2(t_spec *fspec, va_list args, t_param *param)
 {
-	int	j;
-
-	j = 0;
 	if (fspec->convchar == 'c')
 	{
 		param->data = (char*)ft_calloc(2, sizeof(char));
