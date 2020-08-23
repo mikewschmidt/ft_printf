@@ -6,7 +6,7 @@
 /*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/17 08:04:16 by mschmidt          #+#    #+#             */
-/*   Updated: 2020/08/17 09:57:01 by mschmidt         ###   ########.fr       */
+/*   Updated: 2020/08/22 19:46:56 by mschmidt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void			flag_adjust(t_spec *fspec, t_param *param)
 		left_adjust(param);
 	if (fspec->space_flag && param->data[0] != '-')
 	{
-		if (param->data != '\0' && fspec->convchar != 'u')
+		if (param->data[0] != '\0' && fspec->convchar != 'u')
 		{
 			param->data = ft_strappd(" ", param->data, 1);
 			param->len++;
