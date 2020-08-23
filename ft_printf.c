@@ -6,7 +6,7 @@
 /*   By: mschmidt <mschmidt@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/17 07:39:40 by mschmidt          #+#    #+#             */
-/*   Updated: 2020/08/17 09:47:37 by mschmidt         ###   ########.fr       */
+/*   Updated: 2020/08/22 15:42:57 by mschmidt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,8 @@ static char	*replace_stars(char *spec, va_list args)
 
 static void	replace_fspec(char *input_spec, va_list args, t_param *param)
 {
-	int		i;
-	int		j;
 	t_spec	*fspec;
 
-	i = 1;
-	j = 0;
 	input_spec = replace_stars(input_spec, args);
 	fspec = (t_spec*)ft_calloc(1, sizeof(t_spec));
 	parse_spec(fspec, input_spec);
